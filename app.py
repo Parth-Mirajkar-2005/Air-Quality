@@ -170,9 +170,10 @@ if uploaded_file is not None:
             with st.expander("📌 View Model Performance Metrics"):
                 metrics_df = pd.DataFrame({
                     'Pollutant': ['O₃', 'NO₂'],
-                    'Accuracy': [f"{metrics['O3']['R2'] * 100.0 :.2f} %", f"{metrics['NO2']['R2'] * 100.0 :.2f} %"],
+                    'R2': [f"{metrics['O3']['R2']:.2f}", f"{metrics['NO2']['R2']:.2f}"],
                     'RMSE (µg/m³)': [f"{metrics['O3']['RMSE']:.2f}", f"{metrics['NO2']['RMSE']:.2f}"],
-                    'RIA': [f"{metrics['O3']['RIA']:.3f}", f"{metrics['NO2']['RIA']:.3f}"]
+                    'RIA': [f"{metrics['O3']['RIA']:.3f}", f"{metrics['NO2']['RIA']:.3f}"],
+                    'Accuracy': [f"{metrics['O3']['R2'] * 100.0 :.2f} %", f"{metrics['NO2']['R2'] * 100.0 :.2f} %"]
                 }).set_index('Pollutant')
                 st.table(metrics_df)
                 st.caption("Metrics are calculated on the internal validation set during model training.")
