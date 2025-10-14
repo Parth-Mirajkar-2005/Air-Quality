@@ -170,7 +170,7 @@ if uploaded_file is not None:
             with st.expander("📌 View Model Performance Metrics"):
                 metrics_df = pd.DataFrame({
                     'Pollutant': ['O₃', 'NO₂'],
-                    'Accurecy': [f"{metrics['O3']['R2'] * 100.0 :.2f} %", f"{metrics['NO2']['R2'] * 100.0 :.2f} %"],
+                    'Accuracy': [f"{metrics['O3']['R2'] * 100.0 :.2f} %", f"{metrics['NO2']['R2'] * 100.0 :.2f} %"],
                     'RMSE (µg/m³)': [f"{metrics['O3']['RMSE']:.2f}", f"{metrics['NO2']['RMSE']:.2f}"],
                     'RIA': [f"{metrics['O3']['RIA']:.3f}", f"{metrics['NO2']['RIA']:.3f}"]
                 }).set_index('Pollutant')
