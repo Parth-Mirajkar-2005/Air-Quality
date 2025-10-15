@@ -1,19 +1,6 @@
 Air Quality Forecast Engine
 An end-to-end machine learning pipeline for training air quality models and deploying an interactive forecasting dashboard with Streamlit. This project predicts 24-hour concentrations of Ozone (O3) and Nitrogen Dioxide (NO 2) for multiple monitoring sites.
 
-📋 Table of Contents
-
-
-
-
-
-
-
-
-
-
-
-
 📖 Overview
 This project provides a complete solution for air quality forecasting. It consists of two main components:
 
