@@ -1,117 +1,152 @@
-Air Quality Forecast Engine
-An end-to-end machine learning pipeline for training air quality models and deploying an interactive forecasting dashboard with Streamlit. This project predicts 24-hour concentrations of Ozone (O3) and Nitrogen Dioxide (NO 2) for multiple monitoring sites.
+\<div align="center"\>
 
-📖 Overview
-This project provides a complete solution for air quality forecasting. It consists of two main components:
+# 🌍 Air Quality Forecast Engine
 
-A training pipeline (train_and_save_models.py): This script automates the process of loading data for multiple sites, performing extensive feature engineering, training separate LightGBM models for O3 and NO2​, evaluating their performance, and saving the resulting artifacts (models, feature lists, and metrics).
+> An end-to-end machine learning pipeline for training site-specific models and deploying an interactive dashboard to forecast $O_3$ and $NO_2$ concentrations.
 
-An interactive web application (app.py): A Streamlit dashboard that allows users to select a monitoring site, upload unseen input data, and receive a 24-hour forecast. The forecasts are presented in interactive Plotly charts, along with detailed data tables and model performance metrics.
+\</div\>
 
-✨ Key Features
-Multi-Site Modeling: The training pipeline is designed to build and manage models for numerous distinct monitoring sites automatically.
+-----
 
+## 📋 Table of Contents
 
-Advanced Feature Engineering: Implements a sophisticated feature engineering pipeline to capture temporal patterns, satellite data characteristics, wind dynamics, and pollutant interactions.
+A Table of Contents (TOC) is a clickable menu that helps you navigate the document. It provides a quick overview of the project's structure and allows you to jump directly to any section of interest.
 
-High-Performance Models: Utilizes the LightGBM library for fast, efficient, and accurate gradient boosting models.
+  * [📸 Live Demo](#-live-demo)
+  * [✨ Key Features](#-key-features)
+  * [🛠️ Technical Deep Dive](#️-technical-deep-dive)
+  * [🚀 Getting Started](#-getting-started)
+  * [▶️ Usage](#️-usage)
+  * [📁 Project Structure](#-project-structure)
+  * [📦 Technology Stack](#-technology-stack)
 
-Interactive Dashboard: A user-friendly Streamlit application for generating and visualizing forecasts.
+## 📸 Live Demo
 
-Rich Visualizations: Employs Plotly to create interactive, pannable, and zoomable forecast charts with annotations for peak values.
+Below is a placeholder for a GIF showcasing the interactive dashboard. A live demo highlights the fluid user experience, from uploading data to visualizing the 24-hour forecast with interactive Plotly charts.
 
-Model Transparency: The dashboard displays key performance metrics (R2, RMSE, RIA) for the selected site's models, calculated on an internal validation set.
+*(placeholder for app\_demo.gif)*
 
-Data Export: Allows users to download the full 24-hour prediction data as a CSV file.
+## ✨ Key Features
 
-🛠️ Methodology
-The forecasting approach is built on a robust machine learning methodology.
+  * [cite\_start]**🛰️ Multi-Site Modeling**: The training pipeline automatically processes data and trains dedicated models for multiple distinct monitoring sites[cite: 1].
+  * **🧠 Advanced Feature Engineering**: Implements a sophisticated pipeline that generates over 50 features, capturing temporal, meteorological, and chemical interaction patterns to boost model accuracy.
+  * [cite\_start]**⚡ High-Performance Models**: Utilizes LightGBM, a high-performance gradient boosting framework, for fast training and accurate predictions[cite: 1].
+  * **📊 Interactive Dashboard**: A polished and user-friendly Streamlit application for generating, visualizing, and exploring forecasts.
+  * **📈 Rich Visualizations**: Employs Plotly to create fully interactive charts with zooming, panning, and annotations, allowing for in-depth exploration of forecast data.
+  * [cite\_start]\*\* transparency\*\*: The dashboard displays key performance metrics ($R^2$, RMSE, RIA) for each model, calculated on a validation set during training, ensuring transparency about model reliability[cite: 1].
 
-Feature Engineering
-The feature_engineering.py script creates a rich set of features to improve model accuracy:
+## 🛠️ Technical Deep Dive
 
+This section details the architectural choices and methodology.
 
-Time-Based Features: Cyclical features (sine/cosine) are generated for the hour of the day and month of the year to capture daily and seasonal patterns.
+\<details\>
+\<summary\>\<strong\>1. Feature Engineering Rationale\</strong\>\</summary\>
 
+The core of this project's accuracy lies in its feature engineering pipeline. We don't just feed raw data to the model; we enrich it.
 
-Satellite Data Processing: Creates flags for missing satellite data and then applies forward/backward fill to handle gaps.
+  * **Cyclical Time Features**: Time is cyclical (e.g., hours of the day, months of the year). Representing `hour` as a number from 0-23 is problematic because 23 and 0 are far apart numerically but close in time. By converting them into `sin` and `cos` components, we represent time on a circle, which helps the model understand these patterns.
+  * **Satellite Data Handling**: Satellite readings can have gaps due to cloud cover. The pipeline creates a specific `_missing` flag for each satellite column before filling the NaNs. This tells the model not just the value, but also whether that value was original or imputed, which can be a powerful signal.
+  * **Physics-Informed Proxies**: We create features that represent known atmospheric relationships, such as the ratio of HCHO to $NO_2$ from satellite data (`HCHO_NO2_sat_ratio`). These "proxy" features guide the model with domain-specific knowledge.
+  * **Time-Series Features**: Lags and rolling window statistics (mean, std) are created for key variables. This gives the model a memory of recent trends, which is crucial for time-series forecasting.
 
+\</details\>
 
-Wind Features: Calculates wind speed and direction from u and v wind components.
+\<details\>
+\<summary\>\<strong\>2. Modeling and Evaluation Strategy\</strong\>\</summary\>
 
+  * [cite\_start]**Why LightGBM?**: LightGBM (`lgb.LGBMRegressor`) was chosen for its exceptional performance, speed, and lower memory usage compared to other gradient boosting methods[cite: 1]. It's well-suited for the tabular data format of this project.
+  * [cite\_start]**Preventing Overfitting**: We use a chronological 75/25 split for training and validation[cite: 1]. [cite\_start]Crucially, the model uses **early stopping** (`lgb.early_stopping`)[cite: 1]. This monitors the model's performance on the validation set and stops training if it doesn't improve for 50 consecutive rounds, preventing it from memorizing the training data.
+  * **Evaluation Metrics**:
+      * [cite\_start]**$R^2$**: Tells us the percentage of variance in the real-world data that our model can explain[cite: 1].
+      * [cite\_start]**RMSE**: Gives us the typical error magnitude in the original units ($\mu g/m^3$), making it highly interpretable[cite: 1].
+      * **RIA (Refined Index of Agreement)**: A custom metric used to provide a more robust measure of model prediction accuracy.
 
-Physics-Informed Proxies: Creates interaction terms and ratios, such as the ratio of HCHO to NO2 from satellite data, to model chemical relationships.
+\</details\>
 
+## 🚀 Getting Started
 
-Time-Series Features: Generates lagged features (e.g., pollutant concentration from 24 hours prior) and rolling window statistics (mean, std dev) to capture temporal dependencies.
+Follow these steps to set up and run the project locally.
 
-Modeling
-Algorithm: LightGBM (LGBMRegressor), a gradient boosting framework, is used as the core learning algorithm.
+### Prerequisites
 
-Targets: Separate models are trained independently for the two target pollutants: O3 and NO2.
+  * Python 3.9 or higher
+  * `pip` and `venv` for package management
 
-Data Splitting: Data for each site is split chronologically into a 75% training set and a 25% validation set. Early stopping is used during training to prevent overfitting.
+### Installation
 
-Evaluation
-Model performance is assessed on the held-out validation set using three metrics:
+1.  **Clone the repository:**
 
-R-squared (R2): The proportion of the variance in the dependent variable that is predictable from the independent variables.
+    ```bash
+    git clone https://your-repository-url/air-quality-forecast.git
+    cd air-quality-forecast
+    ```
 
-Root Mean Squared Error (RMSE): The standard deviation of the prediction errors, giving a sense of the average error magnitude in the target units (μg/m3).
+2.  **Create and activate a virtual environment:**
 
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+    ```
 
-Refined Index of Agreement (RIA): A robust measure of model prediction accuracy, with the function defined in feature_engineering.py and implemented in train_and_save_models.py.
+3.  **Install the required dependencies from `requirements.txt`:**
 
-📁 Project Structure
-The project expects the following directory structure, which is inferred from the file paths in the scripts:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-⚙️ Setup and Installation
-Clone the repository:
+## ▶️ Usage
 
-Create and activate a virtual environment (recommended):
+The project has two main workflows: training the models and running the forecast app.
 
-Install the required dependencies from requirements.txt:
+### 1\. 🚂 Train the Models
 
-🚀 Usage
-The project workflow is divided into two main steps: training and forecasting.
+  * **Prerequisite**: Place your `site_{id}_train_data.csv` files into a `data/` directory at the project root.
+  * **Run the training script:**
+    ```bash
+    python train_and_save_models.py
+    ```
+    This will generate all necessary model artifacts inside the `models/` directory.
 
-1. Training the Models
-Before running the dashboard, you must train the models by running the training script.
+### 2\. 💡 Launch the Forecast Dashboard
 
-Prerequisite: Place your training data files (e.g., site_1_train_data.csv) into a data/ directory at the project root.
+  * **Prerequisite**: Models must be trained and available in the `models/` directory.
+  * **Run the Streamlit app:**
+    ```bash
+    streamlit run app.py
+    ```
+    Navigate to the local URL provided in your terminal to use the application.
 
-Run the training script from your terminal:
+## 📁 Project Structure
 
-Output: The script will create a models/ directory. Inside, it will generate a subdirectory for each site containing the trained models and other necessary artifacts.
+The project expects the following directory layout:
 
-2. Running the Forecast Dashboard
-Once the models are trained and saved, you can launch the interactive application.
+```
+air-quality-forecast/
+│
+├── data/
+│   ├── site_1_train_data.csv
+│   └── site_1_unseen_input_data.csv
+│
+├── models/
+│   └── site_1/
+│       ├── model_o3.pkl
+│       ├── model_no2.pkl
+│       ├── feature_cols.pkl
+│       └── validation_metrics.pkl
+│
+├── app.py
+├── train_and_save_models.py
+├── feature_engineering.py
+└── requirements.txt
+```
 
-Run the Streamlit app from your terminal:
+## 📦 Technology Stack
 
-How to use the dashboard:
+This project is built with the following core libraries:
 
-Your web browser will open with the application running.
-
-In the sidebar, use the dropdown menu to select the desired Monitoring Site.
-
-Click the "Browse files" button to upload the corresponding unseen input data CSV for that site (e.g., site_1_unseen_input_data.csv).
-
-The application will automatically process the data, generate the 24-hour forecast, and display the results.
-
-📦 Dependencies
-This project relies on the libraries listed in requirements.txt. The key dependencies are:
-
-streamlit
-
-pandas
-
-numpy
-
-scikit-learn
-
-lightgbm
-
-plotly
-
-joblib
+  * **`Streamlit`**: For building the interactive web application.
+  * **`Pandas` & `NumPy`**: For data manipulation and numerical operations.
+  * **`Scikit-learn`**: For data processing and evaluation metrics.
+  * **`LightGBM`**: For the core gradient boosting models.
+  * **`Plotly`**: For creating rich, interactive data visualizations.
+  * **`Joblib`**: For serializing and deserializing Python objects (models, etc.).
