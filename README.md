@@ -1,10 +1,6 @@
-\<div align="center"\>
-
 # 🌍 Air Quality Forecast Engine
 
 > An end-to-end machine learning pipeline for training site-specific models and deploying an interactive dashboard to forecast $O_3$ and $NO_2$ concentrations.
-
-\</div\>
 
 -----
 
@@ -24,23 +20,22 @@ A Table of Contents (TOC) is a clickable menu that helps you navigate the docume
 
 Below is a placeholder for a GIF showcasing the interactive dashboard. A live demo highlights the fluid user experience, from uploading data to visualizing the 24-hour forecast with interactive Plotly charts.
 
-*(placeholder for app\_demo.gif)*
+Link<>
 
 ## ✨ Key Features
 
-  * [cite\_start]**🛰️ Multi-Site Modeling**: The training pipeline automatically processes data and trains dedicated models for multiple distinct monitoring sites[cite: 1].
+  * **🛰️ Multi-Site Modeling**: The training pipeline automatically processes data and trains dedicated models for multiple distinct monitoring sites.
   * **🧠 Advanced Feature Engineering**: Implements a sophisticated pipeline that generates over 50 features, capturing temporal, meteorological, and chemical interaction patterns to boost model accuracy.
-  * [cite\_start]**⚡ High-Performance Models**: Utilizes LightGBM, a high-performance gradient boosting framework, for fast training and accurate predictions[cite: 1].
+  * **⚡ High-Performance Models**: Utilizes LightGBM, a high-performance gradient boosting framework, for fast training and accurate predictions.
   * **📊 Interactive Dashboard**: A polished and user-friendly Streamlit application for generating, visualizing, and exploring forecasts.
   * **📈 Rich Visualizations**: Employs Plotly to create fully interactive charts with zooming, panning, and annotations, allowing for in-depth exploration of forecast data.
-  * [cite\_start]\*\* transparency\*\*: The dashboard displays key performance metrics ($R^2$, RMSE, RIA) for each model, calculated on a validation set during training, ensuring transparency about model reliability[cite: 1].
+  * **⭐ transparency**: The dashboard displays key performance metrics ($R^2$, RMSE, RIA) for each model, calculated on a validation set during training, ensuring transparency about model reliability.
 
 ## 🛠️ Technical Deep Dive
 
 This section details the architectural choices and methodology.
 
-\<details\>
-\<summary\>\<strong\>1. Feature Engineering Rationale\</strong\>\</summary\>
+**1. Feature Engineering Rationale**
 
 The core of this project's accuracy lies in its feature engineering pipeline. We don't just feed raw data to the model; we enrich it.
 
@@ -49,19 +44,15 @@ The core of this project's accuracy lies in its feature engineering pipeline. We
   * **Physics-Informed Proxies**: We create features that represent known atmospheric relationships, such as the ratio of HCHO to $NO_2$ from satellite data (`HCHO_NO2_sat_ratio`). These "proxy" features guide the model with domain-specific knowledge.
   * **Time-Series Features**: Lags and rolling window statistics (mean, std) are created for key variables. This gives the model a memory of recent trends, which is crucial for time-series forecasting.
 
-\</details\>
+**2. Modeling and Evaluation Strategy**
 
-\<details\>
-\<summary\>\<strong\>2. Modeling and Evaluation Strategy\</strong\>\</summary\>
-
-  * [cite\_start]**Why LightGBM?**: LightGBM (`lgb.LGBMRegressor`) was chosen for its exceptional performance, speed, and lower memory usage compared to other gradient boosting methods[cite: 1]. It's well-suited for the tabular data format of this project.
-  * [cite\_start]**Preventing Overfitting**: We use a chronological 75/25 split for training and validation[cite: 1]. [cite\_start]Crucially, the model uses **early stopping** (`lgb.early_stopping`)[cite: 1]. This monitors the model's performance on the validation set and stops training if it doesn't improve for 50 consecutive rounds, preventing it from memorizing the training data.
+  * **Why LightGBM?**: LightGBM (`lgb.LGBMRegressor`) was chosen for its exceptional performance, speed, and lower memory usage compared to other gradient boosting methods. It's well-suited for the tabular data format of this project.
+  * **Preventing Overfitting**: We use a chronological 75/25 split for training and validation. Crucially, the model uses **early stopping** (`lgb.early_stopping`). This monitors the model's performance on the validation set and stops training if it doesn't improve for 50 consecutive rounds, preventing it from memorizing the training data.
   * **Evaluation Metrics**:
-      * [cite\_start]**$R^2$**: Tells us the percentage of variance in the real-world data that our model can explain[cite: 1].
-      * [cite\_start]**RMSE**: Gives us the typical error magnitude in the original units ($\mu g/m^3$), making it highly interpretable[cite: 1].
+      * **$R^2$**: Tells us the percentage of variance in the real-world data that our model can explain.
+      * **RMSE**: Gives us the typical error magnitude in the original units ($\mu g/m^3$), making it highly interpretable.
       * **RIA (Refined Index of Agreement)**: A custom metric used to provide a more robust measure of model prediction accuracy.
 
-\</details\>
 
 ## 🚀 Getting Started
 
